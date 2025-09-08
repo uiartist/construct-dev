@@ -1,0 +1,11 @@
+# Node.js / React
+node_modules/
+build/
+dist/
+
+# PHP / Composer
+vendor/
+
+# Misc
+.env
+.DS_Store
