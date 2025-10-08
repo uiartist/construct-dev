@@ -1,28 +1,197 @@
 <?php
 require 'flight/Flight.php';
+require 'lib/jwt.php';
+require 'config.php';
 
-// Enable CORS (important for React)
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-
-// Default route
-Flight::route('/', function(){
-    echo 'Hello from Flight running on PHP 7.4 with XAMPP!';
+// Register DB service (adjust credentials)
+Flight::register('db', 'PDO', array(
+    "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET,
+    DB_USER,
+    DB_PASS
+), function($db) {
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 });
 
-// Example API route
-Flight::route('/api/hello', function(){
-    Flight::json(['message' => 'Hello API']);
+// Middleware to protect routes
+function require_auth() {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+
+    if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+        Flight::halt(401, json_encode(["success" => false, "message" => "Authorization header missing or invalid"]));
+    }
+
+    $jwt = $matches[1];
+    $payload = SimpleJWT::decode($jwt);
+
+    if (!$payload) {
+        Flight::halt(401, json_encode(["success" => false, "message" => "Invalid or expired token"]));
+    }
+
+    // Attach user info to Flight for use in routes
+    Flight::set('user', $payload);
+}
+
+// 1) API routes first
+Flight::route('GET /api/hello', function() {
+    header("Content-Type: application/json");
+    echo json_encode(["message" => "Hello from API!"]);
 });
 
-// Example endpoint: Get all projects
-Flight::route('GET /api/projects', function(){
-    $projects = [
-        ["id" => 1, "name" => "Lotus Complex", "status" => "Ongoing"],
-        ["id" => 2, "name" => "Highway Bridge Heights", "status" => "Planned"]
+// login API
+Flight::route('POST /api/login', function() {
+    $request = Flight::request();
+    $email = $request->data->email;
+    $password = $request->data->password;
+    //die($email.' > '.$password);
+
+    $pdo = Flight::db();
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+
+    //$pwdHash = password_hash($password, PASSWORD_BCRYPT);
+    //die(var_dump(password_verify($password, $user['password'])));
+//$password = "admin123";
+/* $hash = '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi';
+$hash = hash('sha256', $password);
+echo '$$$$'.$hash.'$$$$';
+if ($user['password'] === $hash) {
+    echo "✅ Password matches!";
+} else {
+    echo "❌ Password failed!";
+} */
+
+/* function hashPassword($password, $salt) {
+    return hash('sha256', $salt . $password);
+}
+
+$salt = bin2hex(random_bytes(16)); // 32-char random salt
+$password = "demo123";
+$hashed = hashPassword($password, $salt);
+echo $hashed.' > '.$salt;
+exit; */
+
+/* function verifyPassword($enteredPassword, $storedHash, $storedSalt) {
+    return hash('sha256', $storedSalt . $enteredPassword) === $storedHash;
+}
+
+if ($user && verifyPassword($password, $user['password'], $user['salt'])) {
+    echo "✅ Login successful!";
+} else {
+    echo "❌ Invalid credentials!";
+}
+exit; */
+
+    if ($user) {
+        // Get the salt from DB
+        $salt = $user['salt'];
+
+        // Hash the provided password with the user's salt
+        $hashedInputPassword = hash('sha256', $password . $salt);
+
+        if (hash_equals($user['password'], $hashedInputPassword)) {
+            // ✅ Successful login → generate JWT
+            $payload = [
+                "id" => $user['id'],
+                "email" => $user['email']
+            ];
+            $token = SimpleJWT::encode($payload);
+
+            Flight::json([
+                "success" => true,
+                "token" => $token,
+                "user" => [
+                    "id" => $user['id'],
+                    "name" => $user['name'],
+                    "email" => $user['email']
+                ]
+            ]);
+            return;
+        }
+    }
+
+    // ❌ If login failed
+    Flight::json(["success" => false, "message" => "Invalid credentials"], 401);
+});
+
+// Dashboard API route (protected)
+Flight::route('GET /api/dashboard', function() {
+    require_auth(); // ✅ this checks JWT before allowing access
+
+    $payload = Flight::get('user'); // we set this in require_auth()
+    
+    $data = [
+        "username" => "Admin",
+        "role" => "Administrator",
+        "projects" => 5,
+        "tasks" => 12,
+        "last_login" => date("Y-m-d H:i:s")
     ];
-    Flight::json($projects);
+
+    Flight::json([
+        "success" => true,
+        "message" => "Welcome to dashboard!",
+        "user" => $payload,
+        "data" => $data
+    ]);
+});
+
+/* Flight::route('GET /dashboard', function() {
+    //require_auth(); // ✅ protect with JWT
+    $user = Flight::get('user');
+    Flight::json([
+        "message" => "Welcome to your dashboard!",
+        "user" => $user
+    ]);
+}); */
+
+// Dashboard API route
+/* Flight::route('GET /api/dashboard', function() {
+    // Example: return static/fake dashboard data for now
+    $data = [
+        "username" => "Admin",
+        "role" => "Administrator",
+        "projects" => 5,
+        "tasks" => 12,
+        "last_login" => date("Y-m-d H:i:s")
+    ];
+
+    Flight::json([
+        "success" => true,
+        "data" => $data
+    ]);
+}); */
+
+// 2) Static assets
+Flight::route('GET /assets/*', function() {
+    $path = __DIR__ . '/public' . Flight::request()->url;
+    if (file_exists($path)) {
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        switch ($ext) {
+            case 'js':  header("Content-Type: application/javascript"); break;
+            case 'css': header("Content-Type: text/css"); break;
+            case 'png': header("Content-Type: image/png"); break;
+            case 'jpg':
+            case 'jpeg': header("Content-Type: image/jpeg"); break;
+            case 'svg': header("Content-Type: image/svg+xml"); break;
+            default: header("Content-Type: text/plain");
+        }
+        readfile($path);
+        exit;
+    }
+    Flight::halt(404, "File not found");
+});
+
+// 3) React catch-all (must be last!)
+// Catch-all route for React frontend
+Flight::route('GET /*', function() {
+    $path = __DIR__ . '/public/index.html';
+    if (file_exists($path)) {
+        readfile($path);
+    } else {
+        echo "React build not found!";
+    }
 });
 
 Flight::start();
