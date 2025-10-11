@@ -42,82 +42,74 @@ function Dashboard() {
   };
 
   return (
-    <div className="container-fluid">
-      <div className="row">
-        {/* Sidebar */}
-        <nav className="col-md-2 d-none d-md-block bg-light sidebar">
-          <div className="sidebar-sticky">
-            <ul className="nav flex-column">
-              <li className="nav-item">
-                <a className="nav-link active" href="#">
-                  Dashboard <span className="sr-only">(current)</span>
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Projects
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Materials
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Users
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Invoices
-                </a>
-              </li>
-            </ul>
-          </div>
-        </nav>
+    <div className="d-flex" style={{ minHeight: "100vh" }}>
+    {/* Sidebar */}
+    <nav
+      className="bg-light p-3 border-end"
+      style={{ width: "220px", minHeight: "100vh" }}
+    >
+      <ul className="nav flex-column">
+        <li className="nav-item">
+          <a className="nav-link active" href="#">
+            Dashboard <span className="sr-only">(current)</span>
+          </a>
+        </li>
+        <li className="nav-item">
+          <a className="nav-link" href="#">Projects</a>
+        </li>
+        <li className="nav-item">
+          <a className="nav-link" href="#">Materials</a>
+        </li>
+        <li className="nav-item">
+          <a className="nav-link" href="#">Users</a>
+        </li>
+        <li className="nav-item">
+          <a className="nav-link" href="#">Invoices</a>
+        </li>
+      </ul>
+    </nav>
 
-        {/* Main content */}
-        <main role="main" className="col-md-9 ml-sm-auto col-lg-10 px-4">
-          <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 className="h2">Dashboard</h1>
-            <button className="btn btn-danger mt-3" onClick={handleLogout}>
+    {/* Main content */}
+    <main className="flex-grow-1 p-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1 className="h2">Dashboard</h1>
+        <div>
+          <button className="btn btn-danger me-2" onClick={handleLogout}>
             Logout
+          </button>
+          <div className="btn-group">
+            <button type="button" className="btn btn-sm btn-outline-secondary">
+              Share
             </button>
-            <div className="btn-toolbar mb-2 mb-md-0">
-              <div className="btn-group mr-2">
-                <button type="button" className="btn btn-sm btn-outline-secondary">
-                  Share
-                </button>
-                <button type="button" className="btn btn-sm btn-outline-secondary">
-                  Export
-                </button>
-              </div>
-              <button type="button" className="btn btn-sm btn-outline-secondary dropdown-toggle">
-                <span data-feather="calendar"></span>
-                This week
-              </button>
-            </div>
+            <button type="button" className="btn btn-sm btn-outline-secondary">
+              Export
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary dropdown-toggle"
+            >
+              This week
+            </button>
           </div>
-
-          <h4>Welcome, {dashboardData.user.name || dashboardData.user.email}!</h4>
-          <p className="lead">{dashboardData.message}</p>
-
-          {/* Example content section */}
-          <div className="card mt-4">
-            <div className="card-body">
-              <h5 className="card-title">Projects Overview</h5>
-              <p className="card-text">
-                This is where project statistics or material allocations can be displayed.
-              </p>
-              <a href="#" className="btn btn-primary">
-                View Projects
-              </a>
-            </div>
-          </div>
-        </main>
+        </div>
       </div>
-    </div>
+
+      <h4>Welcome, {dashboardData.user.name || dashboardData.user.email}!</h4>
+      <p className="lead">{dashboardData.message}</p>
+
+      <div className="card mt-4">
+        <div className="card-body">
+          <h5 className="card-title">Projects Overview</h5>
+          <p className="card-text">
+            This is where project statistics or material allocations can be displayed.
+          </p>
+          <a href="#" className="btn btn-primary">
+            View Projects
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
   );
 }
 
