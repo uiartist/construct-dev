@@ -1,7 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
+import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
+import ProjectList from "./components/ProjectList";
 
 /*function Dashboard() {
   const token = localStorage.getItem("token");
@@ -25,7 +27,11 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Layout />} />
+        <Route path="/projects" element={<ProjectList />} />
+        {/* <Route path="materials" element={<Materials />} />
+        <Route path="users" element={<Users />} />
+        <Route path="invoices" element={<Invoices />} /> */}
       </Routes>
     </Router>
   );
