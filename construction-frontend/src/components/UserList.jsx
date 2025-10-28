@@ -3,6 +3,7 @@ import axios from "axios";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -19,15 +20,21 @@ const UserList = () => {
       .then((res) => {
         if (res.data.success) {
           setUsers(res.data.data);
+          setLoading(false);
         } else {
           setMessage("Failed to fetch users.");
         }
       })
       .catch((err) => {
         console.error(err);
+        setLoading(false);
         setMessage("Error fetching users.");
       });
   }, []);
+
+  if (loading) {
+    return <div className="p-6 text-gray-500">Loading users...</div>;
+  }
 
   return (
     <div className="container-fluid px-4 mt-4">
