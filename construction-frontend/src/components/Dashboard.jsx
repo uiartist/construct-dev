@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Layout from "../components/Layout";
 
 function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
@@ -36,11 +35,6 @@ function Dashboard() {
       </div>
     );
   }
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-  };
 
   return (
     <div className="text-center">
