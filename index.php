@@ -162,6 +162,18 @@ Flight::route('GET /api/projects', function() {
     ]);
 });
 
+Flight::route('GET /api/users', function() {
+    require_auth(); // ✅ protect with JWT
+
+    $pdo = Flight::db();
+    $stmt = $pdo->query("SELECT id, name, email, created_at FROM users ORDER BY id ASC");
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    Flight::json([
+        'success' => true,
+        'data' => $users
+    ]);
+});
 
 /* Flight::route('GET /dashboard', function() {
     //require_auth(); // ✅ protect with JWT

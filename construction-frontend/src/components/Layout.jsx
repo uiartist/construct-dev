@@ -31,6 +31,11 @@ const Layout = () => {
                 Projects
               </Link>
             </li>
+            <li className="mb-2">
+              <Link to="/users" className="text-white text-decoration-none">
+                Users
+              </Link>
+            </li>
           </ul>
         </nav>
         <button
