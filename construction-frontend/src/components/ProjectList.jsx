@@ -72,7 +72,8 @@ function ProjectList() {
                     {project.status}
                   </span>
                 </td>
-                <td>{project.deadline}</td>
+                <td>
+                  {new Date(project.deadline).toLocaleDateString("en-IN")}</td>
               </tr>
             ))}
           </tbody>

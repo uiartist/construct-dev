@@ -25,7 +25,7 @@ function Dashboard() {
   }, [navigate]);
 
   if (!dashboardData) {
-    return <div className="container mt-5">..</div>;
+    return <div className="container mt-5">Loading dashboard...</div>;
   }
 
   if (!dashboardData.success) {

@@ -118,7 +118,7 @@ exit; */
 // Dashboard API route (protected)
 Flight::route('GET /api/dashboard', function() {
     require_auth(); // ✅ this checks JWT before allowing access
-
+    
     $payload = Flight::get('user'); // we set this in require_auth()
     
     $data = [
