@@ -50,47 +50,12 @@ Flight::route('POST /api/login', function() {
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    //$pwdHash = password_hash($password, PASSWORD_BCRYPT);
-    //die(var_dump(password_verify($password, $user['password'])));
-//$password = "admin123";
-/* $hash = '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi';
-$hash = hash('sha256', $password);
-echo '$$$$'.$hash.'$$$$';
-if ($user['password'] === $hash) {
-    echo "✅ Password matches!";
-} else {
-    echo "❌ Password failed!";
-} */
-
-/* function hashPassword($password, $salt) {
-    return hash('sha256', $salt . $password);
-}
-
-$salt = bin2hex(random_bytes(16)); // 32-char random salt
-$password = "demo123";
-$hashed = hashPassword($password, $salt);
-echo $hashed.' > '.$salt;
-exit; */
-
-/* function verifyPassword($enteredPassword, $storedHash, $storedSalt) {
-    return hash('sha256', $storedSalt . $enteredPassword) === $storedHash;
-}
-
-if ($user && verifyPassword($password, $user['password'], $user['salt'])) {
-    echo "✅ Login successful!";
-} else {
-    echo "❌ Invalid credentials!";
-}
-exit; */
-
     if ($user) {
         // Get the salt from DB
         $salt = $user['salt'];
-
-        // Hash the provided password with the user's salt
-        $hashedInputPassword = hash('sha256', $password . $salt);
-
-        if (hash_equals($user['password'], $hashedInputPassword)) {
+        $hashedInput = hash('sha256', $password . $salt);
+        
+if (hash_equals($user['password'], $hashedInput)) {
             // ✅ Successful login → generate JWT
             $payload = [
                 "id" => $user['id'],
