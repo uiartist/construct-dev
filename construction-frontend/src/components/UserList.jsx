@@ -1,28 +1,34 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+//import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      setMessage("Unauthorized. Please log in.");
-      return;
-    }
-
-    axios
-      .get("/api/users", {
+    
+      fetch("/api/users", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        if (res.data.success) {
-          setUsers(res.data.data);
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return null;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.success) {
+          setUsers(data.data);
           setLoading(false);
         } else {
           setMessage("Failed to fetch users.");
+          setLoading(false);
         }
       })
       .catch((err) => {
@@ -30,7 +36,7 @@ const UserList = () => {
         setLoading(false);
         setMessage("Error fetching users.");
       });
-  }, []);
+  }, [navigate]);
 
   if (loading) {
     return <div className="p-6 text-gray-500">Loading users...</div>;

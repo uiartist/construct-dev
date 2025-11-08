@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 //import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function ProjectList() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
   fetch("/api/projects", {
@@ -13,19 +15,28 @@ function ProjectList() {
     },
   })
     .then((response) => {
-      if (!response.ok) throw new Error("Failed to fetch projects");
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/");
+        return null;
+      }
       return response.json();
     })
     .then((data) => {
-      setProjects(data.data || []);
-      setLoading(false);
+      if (data && data.success) {
+        setProjects(data.data || []);
+        setLoading(false);
+      } else {
+        setError("Failed to fetch projects.");
+        setLoading(false);
+      }
     })
     .catch((err) => {
       console.error(err);
       setError(err.message);
       setLoading(false);
     });
-}, []);
+}, [navigate]);
 
   if (loading) {
     return <div className="p-6 text-gray-500">Loading projects...</div>;
