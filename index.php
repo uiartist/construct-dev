@@ -140,6 +140,48 @@ Flight::route('GET /api/users', function() {
     ]);
 });
 
+Flight::route('GET /api/projects/@id:[0-9]+', function($id) {
+    require_auth();
+
+    $db = Flight::db();
+    $stmt = $db->prepare("
+        SELECT id, name, location, status, deadline, created_at
+        FROM projects
+        WHERE id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$id]);
+    $project = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$project) {
+        Flight::json(['success' => false, 'message' => 'Project not found'], 404);
+        return;
+    }
+
+    Flight::json(['success' => true, 'data' => $project]);
+});
+
+Flight::route('GET /api/users/@id:[0-9]+', function($id) {
+    require_auth(); // protect with JWT
+
+    $pdo = Flight::db();
+    $stmt = $pdo->prepare("
+        SELECT id, name, email, phone, job_title, rate, created_at
+        FROM users
+        WHERE id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([ $id ]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) {
+        Flight::json(['success' => false, 'message' => 'User not found'], 404);
+        return;
+    }
+
+    Flight::json(['success' => true, 'data' => $user]);
+});
+
 /* Flight::route('GET /dashboard', function() {
     //require_auth(); // ✅ protect with JWT
     $user = Flight::get('user');

@@ -5,6 +5,8 @@ import Layout from "./components/Layout";
 import Dashboard from "./components/Dashboard";
 import ProjectList from "./components/ProjectList";
 import UserList from "./components/UserList";
+import UserDetails from "./pages/UserDetails";
+import ProjectDetails from "./pages/ProjectDetails";
 
 export default function App() {
   return (
@@ -15,6 +17,8 @@ export default function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="projects" element={<ProjectList />} />
           <Route path="/users" element={<UserList />} />
+          <Route path="/users/:id" element={<UserDetails />} />
+          <Route path="/projects/:id" element={<ProjectDetails />} />
         </Route>
       </Routes>
     </Router>

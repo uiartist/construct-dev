@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 //import axios from "axios";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 const UserList = () => {
@@ -56,6 +57,9 @@ const UserList = () => {
                 <th>#</th>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Phone</th>        
+                <th>Job Title</th>    
+                <th>Rate</th> 
                 <th>Created On</th>
               </tr>
             </thead>
@@ -64,8 +68,11 @@ const UserList = () => {
                 users.map((user, index) => (
                   <tr key={user.id}>
                     <td>{index + 1}</td>
-                    <td>{user.name}</td>
+                    <td> <Link to={`/users/${user.id}`} className="text-decoration-underline" style={{ cursor: "pointer" }}> {user.name} </Link></td>
                     <td>{user.email}</td>
+                    <td>{user.phone || "—"}</td>
+                    <td>{user.job_title || "—"}</td>
+                    <td>{user.rate ?? "—"}</td>
                     <td>
                       {new Date(user.created_at).toLocaleDateString("en-IN")}
                     </td>

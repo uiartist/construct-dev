@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 //import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 
 function ProjectList() {
   const [projects, setProjects] = useState([]);
@@ -66,7 +68,7 @@ function ProjectList() {
           <tbody>
             {projects.map((project) => (
               <tr key={project.id}>
-                <td>{project.name}</td>
+                <td><Link to={`/projects/${project.id}`} className="text-decoration-underline"style={{ cursor: "pointer" }}> {project.name}</Link></td>
                 <td>{project.location}</td>
                 <td>
                   <span
@@ -86,7 +88,7 @@ function ProjectList() {
                 <td>
                   {new Date(project.deadline).toLocaleDateString("en-IN")}</td>
               </tr>
-            ))}
+            ))} 
           </tbody>
         </table>
       </div>
