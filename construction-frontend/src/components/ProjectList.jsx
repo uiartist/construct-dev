@@ -71,7 +71,8 @@ function ProjectList() {
                 <td><Link to={`/projects/${project.id}`} className="text-decoration-underline"style={{ cursor: "pointer" }}> {project.name}</Link></td>
                 <td>{project.location}</td>
                 <td>
-                  <span
+                  <Link
+                    to={`/projects/${project.id}`}
                     className={`badge ${
                       project.status === "completed"
                         ? "bg-success"
@@ -81,9 +82,10 @@ function ProjectList() {
                         ? "bg-warning text-dark"
                         : "bg-secondary"
                     }`}
+                    style={{ cursor: "pointer", textDecoration: "none" }}
                   >
                     {project.status}
-                  </span>
+                  </Link>
                 </td>
                 <td>
                   {new Date(project.deadline).toLocaleDateString("en-IN")}</td>
